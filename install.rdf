@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="openshortcuts@clear-code.com"
+                   em:name="Open Windows Shortcuts Directly"
+                   em:version="0.2"
+                   em:description="Fixups unterminated quotations in mail addresses."
+                   em:creator="ClearCode Inc."
+                   em:homepageURL="http://www.clear-code.com/">
+<!--
+                   em:optionsURL="chrome://openshortcuts/content/config.xul"
+                   em:iconURL="chrome://openshortcuts/content/icon.png"
+-->
+
+    <em:updateURL>http://www.clear-code.com/update.rdf</em:updateURL>
+    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDN4ESXDa0ljqzSDoGs9yy82aR+8tPBIPT8O3FwvXleCB815eOCIKH4lT7L7nK9LKOzdrP5EwiqfugyM+SEXSikbgi+UEfM04HqAomXWUqc7tvXb1kmqx2VwLHxm1tiKuulv1HgHmJtYOh09Tv3+q6VOGX2SDcNe6dgnhnAIP4kYwIDAQAB</em:updateKey>
+
+
+    <em:localized>
+      <RDF:Description em:locale="en-US"
+                       em:name="Open Windows Shortcuts Directly"
+                       em:description="Provides ability to open Windows shortcut files (.lnk files) directly which are attached to message."
+                       em:creator="ClearCode Inc."
+                       em:homepageURL="http://www.clear-code.com/"/>
+    </em:localized>
+    <em:localized>
+      <RDF:Description em:locale="ja"
+                       em:name="Windowsショートカットの直接実行"
+                       em:description="メッセージに添付されたショートカットを直接開けるようにします。"
+                       em:creator="株式会社クリアコード"
+                       em:homepageURL="http://www.clear-code.com/"/>
+    </em:localized>
+
+
+	<em:targetApplication>
+      <!-- Thunderbird -->
+	  <RDF:Description em:id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+	                   em:minVersion="2.0"
+	                   em:maxVersion="2.0.0.*" />
+	</em:targetApplication>
+  </RDF:Description>
+</RDF:RDF>
