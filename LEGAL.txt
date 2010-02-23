@@ -13,7 +13,7 @@ License.
 The Original Code is "Open Windows Shortcuts Directly".
 
 The Initial Developer of the Original Code is ClearCode Inc.
-Portions created by the Initial Developer are Copyright (C) 2008
+Portions created by the Initial Developer are Copyright (C) 2008-2010
 the Initial Developer. All Rights Reserved.
 
 Contributor(s): ClearCode Inc. <info@clear-code.com>

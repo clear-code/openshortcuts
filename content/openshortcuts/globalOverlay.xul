@@ -15,7 +15,7 @@
    - The Original Code is "Open Windows Shortcuts Directly".
    -
    - The Initial Developer of the Original Code is ClearCode Inc.
-   - Portions created by the Initial Developer are Copyright (C) 2008
+   - Portions created by the Initial Developer are Copyright (C) 2008-2010
    - the Initial Developer. All Rights Reserved.
    -
    - Contributor(s): ClearCode Inc. <info@clear-code.com>
@@ -34,5 +34,5 @@
    -
    - ***** END LICENSE BLOCK ***** -->
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-<script type="application/x-javascript" src="globalOverlay.js" />
+<script type="application/javascript" src="globalOverlay.js" />
 </overlay>

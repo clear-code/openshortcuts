@@ -84,13 +84,16 @@ window.addEventListener('DOMContentLoaded', function() {
 					// 同名のファイルがある場合は先に削除する
 					var temp = dest.clone();
 					temp.append(fileName);
-					// tempのexists()が、ファイルが存在していても何故かfalseを返す。
-					// 同じパスで作った別のファイルハンドラだと正しい結果が返ってくる。
+					// tempのexists()が、ファイルが存在していても何故かfalseを返す事がある。
+					// その場合、同じパスで作った別のファイルハンドラだと正しい結果が返ってくる。
 					var tempForDelete = Components.classes['@mozilla.org/file/local;1']
 											.createInstance(Components.interfaces.nsILocalFile);
 					tempForDelete.initWithPath(temp.path);
-					if (tempForDelete.exists())
+					if (tempForDelete.exists()) {
+						var index = this.tempFiles.indexOf(tempForDelete);
+						if (index > -1) this.tempFiles.splice(index, 1);
 						tempForDelete.remove(true);
+					}
 
 					dest = messenger.saveAttachmentToFolder(
 						aAttachment.contentType,
@@ -104,15 +107,16 @@ window.addEventListener('DOMContentLoaded', function() {
 					);
 					var delay = 200;
 					var count = 0;
-					window.setTimeout(function() {
+					window.setTimeout(function(aSelf) {
 						if (dest.exists()) {
+							aSelf.tempFiles.push(dest);
 							dest.QueryInterface(Components.interfaces.nsILocalFile)
 								.launch();
 						}
 						else if (++count < 50) {
-							window.setTimeout(arguments.callee, delay);
+							window.setTimeout(arguments.callee, delay, aSelf);
 						}
-					}, delay);
+					}, delay, this);
 					return true;
 				}
 				catch(e) {
@@ -141,6 +145,8 @@ window.addEventListener('DOMContentLoaded', function() {
 						.QueryInterface(Components.interfaces.nsILocalFile);
 		},
 
+		tempFiles : [],
+
 		ensureAttachLinkFile : function(aAttachment)
 		{
 			var source = aAttachment.url;
@@ -148,6 +154,11 @@ window.addEventListener('DOMContentLoaded', function() {
 
 			var file = this.fileHandler.getFileFromURLSpec(source);
 			if (!/\.lnk$/.test(file.leafName)) return;
+
+			// リンクファイルをそのまま添付しようとすると、ファイル名はリンクファイルなのに
+			// 内容はリンク先のファイル、という状態で添付されてしまう。
+			// この判断は添付元のファイルの拡張子によって行われているようなので、
+			// 一旦テンポラリフォルダ内に別名でコピーして、そちらを添付する。
 
 			var tempLink = this.getTempFolder();
 			tempLink.append('link.tmp');
@@ -158,12 +169,31 @@ window.addEventListener('DOMContentLoaded', function() {
 				file.copyTo(tempLink.parent, tempLink.leafName);
 				aAttachment.url = this.fileHandler.getURLSpecFromFile(tempLink);
 				aAttachment.name = file.leafName;
+				this.tempFiles.push(tempLink);
 //				alert(tempLink.path+'\n'+aAttachment.name);
 			}
 			catch(e) {
 //				alert(e);
 			}
+		},
+
+		init : function()
+		{
+			window.addEventListener('unload', this, false);
+		},
+
+		handleEvent : function(aEvent)
+		{
+			window.removeEventListener('unload', this, false);
+			this.tempFiles.forEach(function(aFile) {
+				try {
+					aFile.remove(true);
+				}
+				catch(e) {
+				}
+			});
 		}
 	};
+	window.WindowsShortcutHandler.init();
 
 }, false);
