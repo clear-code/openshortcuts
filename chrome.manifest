@@ -2,6 +2,7 @@ content	openshortcuts	jar:chrome/openshortcuts.jar!/content/openshortcuts/
 
 overlay	chrome://messenger/content/messenger.xul	chrome://openshortcuts/content/globalOverlay.xul
 overlay	chrome://messenger/content/messageWindow.xul	chrome://openshortcuts/content/globalOverlay.xul
+overlay	chrome://messenger/content/messengercompose/messengercompose.xul	chrome://openshortcuts/content/globalOverlay.xul
 
 locale	openshortcuts	en-US	jar:chrome/openshortcuts.jar!/locale/en-US/openshortcuts/
 locale	openshortcuts	ja	jar:chrome/openshortcuts.jar!/locale/ja/openshortcuts/

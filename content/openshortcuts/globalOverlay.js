@@ -42,10 +42,21 @@ window.addEventListener('DOMContentLoaded', function() {
 		eval('window.openAttachment = '+
 			window.openAttachment.toSource().replace(
 				'{',
-				<><![CDATA[$&
+				<![CDATA[$&
 					if (window.WindowsShortcutHandler.checkAndOpen(aAttachment))
 						return;
-				]]></>
+				]]>.toString()
+			)
+		);
+	}
+
+	// Bug 524874  Windows Shortcuts (.lnk) into the attachment and send not working
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=524874
+	if ('AddUrlAttachment' in window) {
+		eval('window.AddUrlAttachment = '+
+			window.AddUrlAttachment.toSource().replace(
+				'gContentChanged = true;',
+				'$& WindowsShortcutHandler.ensureAttachLinkFile(attachment);'
 			)
 		);
 	}
@@ -68,8 +79,7 @@ window.addEventListener('DOMContentLoaded', function() {
 			}
 			else {
 				try {
-					var dest = this.mDirectoryService.get('TmpD', Components.interfaces.nsIFile)
-								.QueryInterface(Components.interfaces.nsILocalFile);
+					var dest = this.getTempFolder();
 
 					// ìØñºÇÃÉtÉ@ÉCÉãÇ™Ç†ÇÈèÍçáÇÕêÊÇ…çÌèúÇ∑ÇÈ
 					var temp = dest.clone();
@@ -123,6 +133,36 @@ window.addEventListener('DOMContentLoaded', function() {
 				this.mFileHandler = this.mIOService.getProtocolHandler('file')
 					.QueryInterface(Components.interfaces.nsIFileProtocolHandler);
 			return this.mFileHandler;
+		},
+
+		getTempFolder : function()
+		{
+			return this.mDirectoryService.get('TmpD', Components.interfaces.nsIFile)
+						.QueryInterface(Components.interfaces.nsILocalFile);
+		},
+
+		ensureAttachLinkFile : function(aAttachment)
+		{
+			var source = aAttachment.url;
+			if (source.indexOf('file:') != 0) return;
+
+			var file = this.fileHandler.getFileFromURLSpec(source);
+			if (!/\.lnk$/.test(file.leafName)) return;
+
+			var tempLink = this.getTempFolder();
+			tempLink.append('link.tmp');
+			tempLink.createUnique(tempLink.NORMAL_FILE_TYPE, 0666);
+			tempLink.remove(true);
+
+			try {
+				file.copyTo(tempLink.parent, tempLink.leafName);
+				aAttachment.url = this.fileHandler.getURLSpecFromFile(tempLink);
+				aAttachment.name = file.leafName;
+//				alert(tempLink.path+'\n'+aAttachment.name);
+			}
+			catch(e) {
+//				alert(e);
+			}
 		}
 	};
 
