@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="openshortcuts@clear-code.com"
                    em:name="Open Windows Shortcuts Directly"
-                   em:version="0.2"
+                   em:version="0.3"
                    em:description="Fixups unterminated quotations in mail addresses."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/">
@@ -38,7 +38,7 @@
       <!-- Thunderbird -->
 	  <RDF:Description em:id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
 	                   em:minVersion="2.0"
-	                   em:maxVersion="2.0.0.*" />
+	                   em:maxVersion="3.0.*" />
 	</em:targetApplication>
   </RDF:Description>
 </RDF:RDF>
