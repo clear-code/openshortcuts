@@ -14,7 +14,7 @@
  * The Original Code is "Open Windows Shortcuts Directly".
  *
  * The Initial Developer of the Original Code is ClearCode Inc.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Portions created by the Initial Developer are Copyright (C) 2008-2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s): ClearCode Inc. <info@clear-code.com>
@@ -68,15 +68,30 @@ window.addEventListener('DOMContentLoaded', function() {
 			}
 			else {
 				try {
-					var dest = this.mDirectoryService.get('TmpD', Components.interfaces.nsIFile);
-					messenger.saveAttachmentToFolder(
+					var dest = this.mDirectoryService.get('TmpD', Components.interfaces.nsIFile)
+								.QueryInterface(Components.interfaces.nsILocalFile);
+
+					// 同名のファイルがある場合は先に削除する
+					var temp = dest.clone();
+					temp.append(fileName);
+					// tempのexists()が、ファイルが存在していても何故かfalseを返す。
+					// 同じパスで作った別のファイルハンドラだと正しい結果が返ってくる。
+					var tempForDelete = Components.classes['@mozilla.org/file/local;1']
+											.createInstance(Components.interfaces.nsILocalFile);
+					tempForDelete.initWithPath(temp.path);
+					if (tempForDelete.exists())
+						tempForDelete.remove(true);
+
+					dest = messenger.saveAttachmentToFolder(
 						aAttachment.contentType,
 						aAttachment.url,
 						encodeURIComponent(fileName),
-						aAttachment.messageUri,
+						(
+							aAttachment.uri || // Thunderbird 3 or later
+							aAttachment.messageUri // Thunderbird 2
+						),
 						dest
 					);
-					dest.append(fileName);
 					var delay = 200;
 					var count = 0;
 					window.setTimeout(function() {
