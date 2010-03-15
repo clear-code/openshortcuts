@@ -86,13 +86,11 @@ window.addEventListener('DOMContentLoaded', function() {
 					temp.append(fileName);
 					// tempのexists()が、ファイルが存在していても何故かfalseを返す事がある。
 					// その場合、同じパスで作った別のファイルハンドラだと正しい結果が返ってくる。
-					var tempForDelete = Components.classes['@mozilla.org/file/local;1']
-											.createInstance(Components.interfaces.nsILocalFile);
-					tempForDelete.initWithPath(temp.path);
-					if (tempForDelete.exists()) {
-						var index = this.tempFiles.indexOf(tempForDelete);
+					temp = this.getFileWithPath(temp.path);
+					if (temp.exists()) {
+						var index = this.tempFiles.indexOf(temp);
 						if (index > -1) this.tempFiles.splice(index, 1);
-						tempForDelete.remove(true);
+						temp.remove(true);
 					}
 
 					dest = messenger.saveAttachmentToFolder(
@@ -145,6 +143,20 @@ window.addEventListener('DOMContentLoaded', function() {
 						.QueryInterface(Components.interfaces.nsILocalFile);
 		},
 
+		getWindowsFolder : function()
+		{
+			return this.mDirectoryService.get('WinD', Components.interfaces.nsIFile)
+						.QueryInterface(Components.interfaces.nsILocalFile);
+		},
+
+		getFileWithPath : function(aPath)
+		{
+			var file = Components.classes['@mozilla.org/file/local;1']
+						.createInstance(Components.interfaces.nsILocalFile);
+			file.initWithPath(aPath);
+			return file;
+		},
+
 		tempFiles : [],
 
 		ensureAttachLinkFile : function(aAttachment)
@@ -154,6 +166,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
 			var file = this.fileHandler.getFileFromURLSpec(source);
 			if (!/\.lnk$/.test(file.leafName)) return;
+
+			// Thunderbird 2以前であれば何もしない
+			var XULAppInfo = Components.classes['@mozilla.org/xre/app-info;1']
+								.getService(Components.interfaces.nsIXULAppInfo);
+			var comparator = Components.classes['@mozilla.org/xpcom/version-comparator;1']
+								.getService(Components.interfaces.nsIVersionComparator);
+			if (comparator.compare(XULAppInfo.version, '3.0') < 0)
+				return;
 
 			// リンクファイルをそのまま添付しようとすると、ファイル名はリンクファイルなのに
 			// 内容はリンク先のファイル、という状態で添付されてしまう。
@@ -166,6 +186,9 @@ window.addEventListener('DOMContentLoaded', function() {
 			tempLink.remove(true);
 
 			try {
+				// フォルダへのリンクファイルのコピーに失敗する場合がある。
+				// 同じパスで作った別のファイルハンドラだと期待通りの結果になる。
+				file = this.getFileWithPath(file.path);
 				file.copyTo(tempLink.parent, tempLink.leafName);
 				aAttachment.url = this.fileHandler.getURLSpecFromFile(tempLink);
 				aAttachment.name = file.leafName;
@@ -175,6 +198,37 @@ window.addEventListener('DOMContentLoaded', function() {
 			catch(e) {
 //				alert(e);
 			}
+		},
+
+		forceCopyLinkFile : function(aFrom, aTo)
+		{
+			// XPCOM経由でやると、フォルダへのショートカットの複製に失敗する。
+			// フォルダの時だけはWindowsネイティブのコマンドで処理する。
+			var cmd = this.getWindowsFolder();
+			cmd.append('system32');
+			cmd.append('cmd.exe');
+			if (cmd.exists()) {
+				try {
+					let process = Components.classes['@mozilla.org/process/util;1']
+									.createInstance(Components.interfaces.nsIProcess);
+					process.init(cmd);
+					let args = [
+							'/Q',
+							'/C',
+							'copy',
+							aFrom.path,
+							aTo.path
+						];
+					process.run(false, args, args.length, {});
+					if (aTo.exists())
+						return;
+				}
+				catch(e) {
+				}
+			}
+
+			// fallback to XPCOM solution
+			aFrom.copyTo(aTo.parent, aTo.leafName);
 		},
 
 		init : function()
