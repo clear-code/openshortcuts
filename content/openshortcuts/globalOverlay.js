@@ -234,11 +234,30 @@ window.addEventListener('DOMContentLoaded', function() {
 		init : function()
 		{
 			window.addEventListener('unload', this, false);
+			window.addEventListener('attachments-added', this, false);
 		},
 
 		handleEvent : function(aEvent)
 		{
+			switch (aEvent.type)
+			{
+				case 'attachments-added':
+					return this.onAttachmentAdded(aEvent);
+				case 'unload':
+					return this.onUnload();
+			}
+		},
+
+		onAttachmentAdded : function(aEvent)
+		{
+			this.ensureAttachLinkFile(aEvent.detail);
+		},
+
+		onUnload : function()
+		{
 			window.removeEventListener('unload', this, false);
+			window.removeEventListener('attachments-added', this, false);
+
 			this.tempFiles.forEach(function(aFile) {
 				try {
 					aFile.remove(true);
