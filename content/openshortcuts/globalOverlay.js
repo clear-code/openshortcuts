@@ -50,6 +50,16 @@ window.addEventListener('DOMContentLoaded', function() {
 		);
 	}
 
+	if ('AttachmentInfo' in window) {
+		let originalOpen = AttachmentInfo.prototype.open;
+		AttachmentInfo.prototype.open = function () {
+			this.displayName = this.name;
+			if (window.WindowsShortcutHandler.checkAndOpen(this))
+				return;
+			originalOpen.call(this);
+		};
+	}
+
 	// Bug 524874  Windows Shortcuts (.lnk) into the attachment and send not working
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=524874
 	if ('AddUrlAttachment' in window) {
