@@ -14,7 +14,7 @@
  * The Original Code is "Open Windows Shortcuts Directly".
  *
  * The Initial Developer of the Original Code is ClearCode Inc.
- * Portions created by the Initial Developer are Copyright (C) 2008-2010
+ * Portions created by the Initial Developer are Copyright (C) 2008-2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s): ClearCode Inc. <info@clear-code.com>
@@ -57,6 +57,23 @@ window.addEventListener('DOMContentLoaded', function() {
 			window.AddUrlAttachment.toSource().replace(
 				'gContentChanged = true;',
 				'$& WindowsShortcutHandler.ensureAttachLinkFile(attachment);'
+			)
+		);
+	}
+	if ('FileToAttachment' in window) {
+		eval('window.FileToAttachment = '+
+			window.FileToAttachment.toSource().replace(
+				'return attachment;',
+				'return WindowsShortcutHandler.ensureAttachLinkFile(attachment);'
+			)
+		);
+	}
+	if ('envelopeDragObserver' in window &&
+		'onDrop' in envelopeDragObserver) {
+		eval('envelopeDragObserver.onDrop = '+
+			envelopeDragObserver.onDrop.toSource().replace(
+				'attachments.push(attachment);',
+				'attachments.push(WindowsShortcutHandler.ensureAttachLinkFile(attachment));'
 			)
 		);
 	}
@@ -162,10 +179,10 @@ window.addEventListener('DOMContentLoaded', function() {
 		ensureAttachLinkFile : function(aAttachment)
 		{
 			var source = aAttachment.url;
-			if (source.indexOf('file:') != 0) return;
+			if (source.indexOf('file:') != 0) return aAttachment;
 
 			var file = this.fileHandler.getFileFromURLSpec(source);
-			if (!/\.lnk$/.test(file.leafName)) return;
+			if (!/\.lnk$/.test(file.leafName)) return aAttachment;
 
 			// Thunderbird 2以前であれば何もしない
 			var XULAppInfo = Components.classes['@mozilla.org/xre/app-info;1']
@@ -173,7 +190,7 @@ window.addEventListener('DOMContentLoaded', function() {
 			var comparator = Components.classes['@mozilla.org/xpcom/version-comparator;1']
 								.getService(Components.interfaces.nsIVersionComparator);
 			if (comparator.compare(XULAppInfo.version, '3.0') < 0)
-				return;
+				return aAttachment;
 
 			// リンクファイルをそのまま添付しようとすると、ファイル名はリンクファイルなのに
 			// 内容はリンク先のファイル、という状態で添付されてしまう。
@@ -192,12 +209,14 @@ window.addEventListener('DOMContentLoaded', function() {
 				file.copyTo(tempLink.parent, tempLink.leafName);
 				aAttachment.url = this.fileHandler.getURLSpecFromFile(tempLink);
 				aAttachment.name = file.leafName;
+				aAttachment.size = file.fileSize;
 				this.tempFiles.push(tempLink);
-//				alert(tempLink.path+'\n'+aAttachment.name);
+				//alert(tempLink.path+'\n'+aAttachment.name);
 			}
 			catch(e) {
-//				alert(e);
+				//alert(e);
 			}
+			return aAttachment;
 		},
 
 		forceCopyLinkFile : function(aFrom, aTo)
