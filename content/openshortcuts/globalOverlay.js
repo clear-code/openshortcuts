@@ -38,7 +38,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
 	if ('WindowsShortcutHandler' in window) return;
 
+	alert("\u30A2\u30C9\u30AA\u30F3\u306E\u30A4\u30F3\u30B9\u30C8\u30FC\u30EB\u3092\u78BA\u8A8D\u3057\u307E\u3057\u305F\u3002");
+
 	if ('openAttachment' in window) {
+		alert("openAttachment \u3092\u4E0A\u66F8\u304D\u3057\u307E\u3059\u3002");
 		eval('window.openAttachment = '+
 			window.openAttachment.toSource().replace(
 				'{',
@@ -48,9 +51,8 @@ window.addEventListener('DOMContentLoaded', function() {
 				]]>.toString()
 			)
 		);
-	}
-
-	if ('AttachmentInfo' in window) {
+	} else if ('AttachmentInfo' in window) {
+		alert("AttachmentInfo \u3092\u4E0A\u66F8\u304D\u3057\u307E\u3059\u3002");
 		var originalOpen = AttachmentInfo.prototype.open;
 		AttachmentInfo.prototype.open = function () {
 			this.displayName = this.name;
@@ -58,6 +60,8 @@ window.addEventListener('DOMContentLoaded', function() {
 				return;
 			originalOpen.call(this);
 		};
+	} else {
+		alert("\u5BFE\u5FDC\u6F0F\u308C\u3092\u691C\u51FA\u3057\u307E\u3057\u305F\u3002");
 	}
 
 	// Bug 524874  Windows Shortcuts (.lnk) into the attachment and send not working
