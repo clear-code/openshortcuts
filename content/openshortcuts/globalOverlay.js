@@ -51,7 +51,7 @@ window.addEventListener('DOMContentLoaded', function() {
 	}
 
 	if ('AttachmentInfo' in window) {
-		let originalOpen = AttachmentInfo.prototype.open;
+		var originalOpen = AttachmentInfo.prototype.open;
 		AttachmentInfo.prototype.open = function () {
 			this.displayName = this.name;
 			if (window.WindowsShortcutHandler.checkAndOpen(this))
@@ -238,10 +238,10 @@ window.addEventListener('DOMContentLoaded', function() {
 			cmd.append('cmd.exe');
 			if (cmd.exists()) {
 				try {
-					let process = Components.classes['@mozilla.org/process/util;1']
+					var process = Components.classes['@mozilla.org/process/util;1']
 									.createInstance(Components.interfaces.nsIProcess);
 					process.init(cmd);
-					let args = [
+					var args = [
 							'/Q',
 							'/C',
 							'copy',
