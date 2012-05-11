@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="openshortcuts@clear-code.com"
                    em:name="Open Windows Shortcuts Directly"
-                   em:version="0.4"
+                   em:version="0.5"
                    em:description="Fixups unterminated quotations in mail addresses."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/">
