@@ -108,11 +108,11 @@ window.addEventListener('DOMContentLoaded', function() {
 				try {
 					var dest = this.getTempFolder();
 
-					// 同名のファイルがある場合は先に削除する
+					// Remove the old temporary file at first!
 					var temp = dest.clone();
 					temp.append(fileName);
-					// tempのexists()が、ファイルが存在していても何故かfalseを返す事がある。
-					// その場合、同じパスで作った別のファイルハンドラだと正しい結果が返ってくる。
+					// nsIFile#exists() can return "false" even if it actually exists.
+					// However, it works correcly if I re-create new file handler for the same path.
 					temp = this.getFileWithPath(temp.path);
 					if (temp.exists()) {
 						var index = this.tempFiles.indexOf(temp);
@@ -194,7 +194,7 @@ window.addEventListener('DOMContentLoaded', function() {
 			var file = this.fileHandler.getFileFromURLSpec(source);
 			if (!/\.lnk$/.test(file.leafName)) return aAttachment;
 
-			// Thunderbird 2以前であれば何もしない
+			// Do nothing for Thunderbird 2 or older versions.
 			var XULAppInfo = Components.classes['@mozilla.org/xre/app-info;1']
 								.getService(Components.interfaces.nsIXULAppInfo);
 			var comparator = Components.classes['@mozilla.org/xpcom/version-comparator;1']
@@ -202,10 +202,12 @@ window.addEventListener('DOMContentLoaded', function() {
 			if (comparator.compare(XULAppInfo.version, '3.0') < 0)
 				return aAttachment;
 
-			// リンクファイルをそのまま添付しようとすると、ファイル名はリンクファイルなのに
-			// 内容はリンク先のファイル、という状態で添付されてしまう。
-			// この判断は添付元のファイルの拡張子によって行われているようなので、
-			// 一旦テンポラリフォルダ内に別名でコピーして、そちらを添付する。
+			// When we attach a link file, Thunderbird resolves the link and
+			// attach the linked target file instead of the link file itself.
+			// (However, the name of the attached file is still same to the link file!)
+			// Thunderbird detects link files based on their extension "*.lnk",
+			// so, we have to copy the link file into the temporary directory
+			// with another temporary extension before attaching it.
 
 			var tempLink = this.getTempFolder();
 			tempLink.append('link.tmp');
@@ -213,8 +215,8 @@ window.addEventListener('DOMContentLoaded', function() {
 			tempLink.remove(true);
 
 			try {
-				// フォルダへのリンクファイルのコピーに失敗する場合がある。
-				// 同じパスで作った別のファイルハンドラだと期待通りの結果になる。
+				// We can fail to copy link files which link to folders.
+				// However, it works correcly if I re-create new file handler for the same path.
 				file = this.getFileWithPath(file.path);
 				file.copyTo(tempLink.parent, tempLink.leafName);
 				aAttachment.url = this.fileHandler.getURLSpecFromFile(tempLink);
@@ -231,8 +233,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
 		forceCopyLinkFile : function(aFrom, aTo)
 		{
-			// XPCOM経由でやると、フォルダへのショートカットの複製に失敗する。
-			// フォルダの時だけはWindowsネイティブのコマンドで処理する。
+			// We cannot copy link files via XPCOM. So, we have to do it by
+			// system commands in Windows.
 			var cmd = this.getWindowsFolder();
 			cmd.append('system32');
 			cmd.append('cmd.exe');
