@@ -123,17 +123,19 @@ window.addEventListener('DOMContentLoaded', function() {
 					dest = messenger.saveAttachmentToFolder(
 						aAttachment.contentType,
 						aAttachment.url,
-						encodeURIComponent(fileName),
+						encodeURIComponent(fileName + ".tmp"),
 						(
 							aAttachment.uri || // Thunderbird 3 or later
 							aAttachment.messageUri // Thunderbird 2
 						),
 						dest
 					);
+
 					var delay = 200;
 					var count = 0;
 					window.setTimeout(function(aSelf) {
 						if (dest.exists()) {
+							dest.moveTo(dest.parent, fileName);
 							aSelf.tempFiles.push(dest);
 							dest.QueryInterface(Components.interfaces.nsILocalFile)
 								.launch();
