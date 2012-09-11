@@ -6,7 +6,7 @@
                    em:id="openshortcuts@clear-code.com"
                    em:name="Open Windows Shortcuts Directly"
                    em:version="0.5"
-                   em:description="Fixups unterminated quotations in mail addresses."
+                   em:description="Provides ability to open Windows shortcut files (.lnk files) directly which are attached to message."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/">
 <!--
