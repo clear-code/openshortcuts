@@ -14,7 +14,7 @@
  * The Original Code is "Open Windows Shortcuts Directly".
  *
  * The Initial Developer of the Original Code is ClearCode Inc.
- * Portions created by the Initial Developer are Copyright (C) 2008-2012
+ * Portions created by the Initial Developer are Copyright (C) 2008-2013
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s): ClearCode Inc. <info@clear-code.com>
@@ -38,6 +38,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
 	if ('WindowsShortcutHandler' in window) return;
 
+	dump('WindowsShortcutHandler initialization process\n');
+
 	if ('openAttachment' in window) {
 		eval('window.openAttachment = '+
 			window.openAttachment.toSource().replace(
@@ -48,6 +50,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				]]>.toString()
 			)
 		);
+		dump('openAttachment is updated.\n');
 	}
 
 	if ('AttachmentInfo' in window) {
@@ -58,6 +61,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				return;
 			originalOpen.call(this);
 		};
+		dump('AttachmentInfo.prototype.open is updated.\n');
 	}
 
 	// Bug 524874  Windows Shortcuts (.lnk) into the attachment and send not working
@@ -69,6 +73,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				'$& WindowsShortcutHandler.ensureAttachLinkFile(attachment);'
 			)
 		);
+		dump('AddUrlAttachment is updated.\n');
 	}
 	if ('FileToAttachment' in window) {
 		eval('window.FileToAttachment = '+
@@ -77,6 +82,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				'return WindowsShortcutHandler.ensureAttachLinkFile(attachment);'
 			)
 		);
+		dump('FileToAttachment is updated.\n');
 	}
 	if ('envelopeDragObserver' in window &&
 		'onDrop' in envelopeDragObserver) {
@@ -86,12 +92,14 @@ window.addEventListener('DOMContentLoaded', function() {
 				'attachments.push(WindowsShortcutHandler.ensureAttachLinkFile(attachment));'
 			)
 		);
+		dump('envelopeDragObserver.onDrop is updated.\n');
 	}
 
 	window.WindowsShortcutHandler = {
 		checkAndOpen : function(aAttachment) {
 			var fileName = aAttachment.displayName;
-			if (!/\.lnk$/i.test(fileName)) return false;
+			if (!/\.lnk$/i.test(fileName))
+				return false;
 
 			if (aAttachment.isExternalAttachment ||
 				/^file:\/\//.test(aAttachment.url)) {
@@ -102,6 +110,7 @@ window.addEventListener('DOMContentLoaded', function() {
 					return true;
 				}
 				catch(e) {
+					Components.utils.reportError(e);
 				}
 			}
 			else {
@@ -147,6 +156,7 @@ window.addEventListener('DOMContentLoaded', function() {
 					return true;
 				}
 				catch(e) {
+					Components.utils.reportError(e);
 				}
 			}
 			return false;
