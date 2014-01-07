@@ -100,8 +100,10 @@ window.addEventListener('DOMContentLoaded', function() {
 			if (!/\.lnk$/i.test(fileName))
 				return false;
 
+			dump('Trying to open a shortcut.\n');
 			if (aAttachment.isExternalAttachment ||
 				/^file:\/\//.test(aAttachment.url)) {
+				dump('file = ' + aAttachment.url + '\n');
 				try {
 					var file = this.fileHandler.getFileFromURLSpec(aAttachment.url);
 					file.QueryInterface(Components.interfaces.nsILocalFile)
@@ -128,6 +130,8 @@ window.addEventListener('DOMContentLoaded', function() {
 						temp.remove(true);
 					}
 
+					dump('file = ' + aAttachment.url + '\n');
+					dump('uri = ' + aAttachment.uri + '\n');
 					dest = messenger.saveAttachmentToFolder(
 						aAttachment.contentType,
 						aAttachment.url,
@@ -138,13 +142,16 @@ window.addEventListener('DOMContentLoaded', function() {
 						),
 						dest
 					);
+					dump('dest = ' + dest.path + '\n');
 
 					var delay = 200;
 					var count = 0;
 					window.setTimeout(function(aSelf) {
+						dump('saved? : ' + dest.exists() + '\n');
 						if (dest.exists()) {
 							dest.moveTo(dest.parent, fileName);
 							aSelf.tempFiles.push(dest);
+							dump(' => ' + dest.path + '\n');
 							dest.QueryInterface(Components.interfaces.nsILocalFile)
 								.launch();
 						}
