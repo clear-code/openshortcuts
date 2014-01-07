@@ -44,10 +44,9 @@ window.addEventListener('DOMContentLoaded', function() {
 		eval('window.openAttachment = '+
 			window.openAttachment.toSource().replace(
 				'{',
-				<![CDATA[$&
-					if (window.WindowsShortcutHandler.checkAndOpen(aAttachment))
-						return;
-				]]>.toString()
+				'$&\n' +
+				'  if (window.WindowsShortcutHandler.checkAndOpen(aAttachment))\n' +
+				'    return;\n'
 			)
 		);
 		dump('openAttachment is updated.\n');
