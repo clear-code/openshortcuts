@@ -14,8 +14,8 @@
                    em:iconURL="chrome://openshortcuts/content/icon.png"
 -->
 
-    <em:updateURL>http://www.clear-code.com/update.rdf</em:updateURL>
-    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDN4ESXDa0ljqzSDoGs9yy82aR+8tPBIPT8O3FwvXleCB815eOCIKH4lT7L7nK9LKOzdrP5EwiqfugyM+SEXSikbgi+UEfM04HqAomXWUqc7tvXb1kmqx2VwLHxm1tiKuulv1HgHmJtYOh09Tv3+q6VOGX2SDcNe6dgnhnAIP4kYwIDAQAB</em:updateKey>
+    <!--em:updateURL></em:updateURL-->
+    <!--em:updateKey></em:updateKey-->
 
 
     <em:localized>
