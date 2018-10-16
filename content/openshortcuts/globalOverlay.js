@@ -207,7 +207,7 @@ window.addEventListener('DOMContentLoaded', function() {
 		ensureAttachLinkFile : function(aAttachment)
 		{
 			var source = aAttachment.url;
-			if (source.indexOf('file:') != 0) return aAttachment;
+			if (source == undefined || source.indexOf('file:') != 0) return aAttachment;
 
 			var file = this.fileHandler.getFileFromURLSpec(source);
 			if (!/\.lnk$/.test(file.leafName)) return aAttachment;
@@ -229,7 +229,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 			var tempLink = this.getTempFolder();
 			tempLink.append('link.tmp');
-			tempLink.createUnique(tempLink.NORMAL_FILE_TYPE, 0666);
+			tempLink.createUnique(tempLink.NORMAL_FILE_TYPE, 0o666);
 			tempLink.remove(true);
 
 			try {
