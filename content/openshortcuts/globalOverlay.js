@@ -106,7 +106,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				dump('file = ' + aAttachment.url + '\n');
 				try {
 					var file = this.fileHandler.getFileFromURLSpec(aAttachment.url);
-					file.QueryInterface(Components.interfaces.nsILocalFile)
+					file.QueryInterface(Components.interfaces.nsILocalFileWin)
 						.launch();
 					return true;
 				}
@@ -152,7 +152,7 @@ window.addEventListener('DOMContentLoaded', function() {
 							dest.moveTo(dest.parent, fileName);
 							aSelf.tempFiles.push(dest);
 							dump(' => ' + dest.path + '\n');
-							dest.QueryInterface(Components.interfaces.nsILocalFile)
+							dest.QueryInterface(Components.interfaces.nsILocalFileWin)
 								.launch();
 						}
 						else if (++count < 50) {
@@ -185,19 +185,19 @@ window.addEventListener('DOMContentLoaded', function() {
 		getTempFolder : function()
 		{
 			return this.mDirectoryService.get('TmpD', Components.interfaces.nsIFile)
-						.QueryInterface(Components.interfaces.nsILocalFile);
+						.QueryInterface(Components.interfaces.nsILocalFileWin);
 		},
 
 		getWindowsFolder : function()
 		{
 			return this.mDirectoryService.get('WinD', Components.interfaces.nsIFile)
-						.QueryInterface(Components.interfaces.nsILocalFile);
+						.QueryInterface(Components.interfaces.nsILocalFileWin);
 		},
 
 		getFileWithPath : function(aPath)
 		{
 			var file = Components.classes['@mozilla.org/file/local;1']
-						.createInstance(Components.interfaces.nsILocalFile);
+						.createInstance(Components.interfaces.nsILocalFileWin);
 			file.initWithPath(aPath);
 			return file;
 		},
